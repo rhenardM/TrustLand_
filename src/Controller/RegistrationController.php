@@ -3,42 +3,50 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
-use App\Security\SecurityAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    public function register
+    (
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher, 
+        EntityManagerInterface $entityManager
+    ):  JsonResponse
     {
-        $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $plainPassword */
-            $plainPassword = $form->get('plainPassword')->getData();
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $firstName = $data['firstName'] ?? null;
+        $lastName = $data['lastName'] ?? null;
 
-            // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            // do anything else you need here, like send an email
-
-            return $security->login($user, SecurityAuthenticator::class, 'main');
+        if (!$email || !$password || !$firstName || !$lastName) {
+            return new JsonResponse(['error' => 'All fields are required.'], Response::HTTP_BAD_REQUEST);
         }
+        // Vérifier si un utilisateur avec cet email existe déjà
+        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+        if ($existingUser) {
+            return new JsonResponse(['error' => 'Email is already taken.'], Response::HTTP_CONFLICT);
+        }
+        // Créer un nouvel utilisateur
+        $user = new User();
+        $user->setEmail($email);
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setPassword($passwordHasher->hashPassword($user, $password));
 
-        return $this->render('registration/register.html.twig', [
-            'registrationForm' => $form,
-        ]);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'User registered successfully.'], Response::HTTP_CREATED);
     }
+
 }

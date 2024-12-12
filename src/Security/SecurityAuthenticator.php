@@ -27,20 +27,40 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
     }
 
     public function authenticate(Request $request): Passport
-    {
-        $email = $request->getPayload()->getString('email');
+{
+    $data = json_decode($request->getContent(), true);
 
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+    $email = $data['email'] ?? null;
+    $password = $data['password'] ?? null;
 
-        return new Passport(
-            new UserBadge($email),
-            new PasswordCredentials($request->getPayload()->getString('password')),
-            [
-                new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
-                new RememberMeBadge(),
-            ]
-        );
-    }
+    $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+
+    return new Passport(
+        new UserBadge($email),
+        new PasswordCredentials($password),
+        [
+            new CsrfTokenBadge('authenticate', $data['_csrf_token'] ?? ''),
+            new RememberMeBadge(),
+        ]
+    );
+}
+
+
+    // public function authenticate(Request $request): Passport
+    // {
+    //     $email = $request->getPayload()->getString('email');
+
+    //     $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+
+    //     return new Passport(
+    //         new UserBadge($email),
+    //         new PasswordCredentials($request->getPayload()->getString('password')),
+    //         [
+    //             new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
+    //             new RememberMeBadge(),
+    //         ]
+    //     );
+    // }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {

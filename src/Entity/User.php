@@ -11,6 +11,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+
+    /**
+     * @ApiResource(
+     *     collectionOperations={
+     *         "get"={"security"="is_granted('ROLE_USER')"},
+     *         "post"={"security"="is_granted('IS_AUTHENTICATED_ANONYMOUSLY')"}
+     *     },
+     *     itemOperations={
+     *         "get"={"security"="is_granted('ROLE_USER')"}
+     *     }
+     * )
+     * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+     */
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
