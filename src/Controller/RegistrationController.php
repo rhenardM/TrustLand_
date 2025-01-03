@@ -27,6 +27,8 @@ class RegistrationController extends AbstractController
         $password = $data['password'] ?? null;
         $firstName = $data['firstName'] ?? null;
         $lastName = $data['lastName'] ?? null;
+        $phone = $data['phone'] ?? null;
+        $address = $data['address'] ?? null;
 
         if (!$email || !$password || !$firstName || !$lastName) {
             return new JsonResponse(['error' => 'All fields are required.'], Response::HTTP_BAD_REQUEST);
@@ -41,6 +43,9 @@ class RegistrationController extends AbstractController
         $user->setEmail($email);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
+        $user->setPhone($phone);
+        $user->setAddress($address);
+        $user->setRoles($data['roles']); 
         $user->setPassword($passwordHasher->hashPassword($user, $password));
 
         $entityManager->persist($user);

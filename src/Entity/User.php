@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -35,6 +37,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 15)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $address = null;
+
     /**
      * @var list<string> The user roles
      */
@@ -47,11 +61,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $firstName = null;
+    /**
+     * @var Collection<int, Owner>
+     */
+    #[ORM\OneToMany(targetEntity: Owner::class, mappedBy: 'user')]
+    private Collection $owners;
 
-    #[ORM\Column(length: 255)]
-    private ?string $lastName = null;
+    /**
+     * @var Collection<int, Cadastre>
+     */
+    #[ORM\OneToMany(targetEntity: Cadastre::class, mappedBy: 'User')]
+    private Collection $cadastres;
+
+    /**
+     * @var Collection<int, CTI>
+     */
+    #[ORM\OneToMany(targetEntity: CTI::class, mappedBy: 'User')]
+    private Collection $cTIs;
+
+    public function __construct()
+    {
+        $this->owners = new ArrayCollection();
+        $this->cadastres = new ArrayCollection();
+        $this->cTIs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -97,8 +130,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param list<string> $roles
      */
-    public function setRoles(array $roles): static
+    public function setRoles(array|string $roles): static
     {
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+        
         $this->roles = $roles;
 
         return $this;
@@ -148,6 +185,120 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Owner>
+     */
+    public function getOwners(): Collection
+    {
+        return $this->owners;
+    }
+
+    public function addOwner(Owner $owner): static
+    {
+        if (!$this->owners->contains($owner)) {
+            $this->owners->add($owner);
+            $owner->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwner(Owner $owner): static
+    {
+        if ($this->owners->removeElement($owner)) {
+            // set the owning side to null (unless already changed)
+            if ($owner->getUser() === $this) {
+                $owner->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cadastre>
+     */
+    public function getCadastres(): Collection
+    {
+        return $this->cadastres;
+    }
+
+    public function addCadastre(Cadastre $cadastre): static
+    {
+        if (!$this->cadastres->contains($cadastre)) {
+            $this->cadastres->add($cadastre);
+            $cadastre->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCadastre(Cadastre $cadastre): static
+    {
+        if ($this->cadastres->removeElement($cadastre)) {
+            // set the owning side to null (unless already changed)
+            if ($cadastre->getUser() === $this) {
+                $cadastre->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CTI>
+     */
+    public function getCTIs(): Collection
+    {
+        return $this->cTIs;
+    }
+
+    public function addCTI(CTI $cTI): static
+    {
+        if (!$this->cTIs->contains($cTI)) {
+            $this->cTIs->add($cTI);
+            $cTI->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCTI(CTI $cTI): static
+    {
+        if ($this->cTIs->removeElement($cTI)) {
+            // set the owning side to null (unless already changed)
+            if ($cTI->getUser() === $this) {
+                $cTI->setUser(null);
+            }
+        }
 
         return $this;
     }

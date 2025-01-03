@@ -1,59 +1,135 @@
+# security:
+#     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+#     password_hashers:
+#         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+#     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+#     providers:
+#         # used to reload user from session & other features (e.g. switch_user)
+#         app_user_provider:
+#             entity:
+#                 class: App\Entity\User
+#                 property: email
+#     firewalls:
+#         dev:
+#             pattern: ^/(_(profiler|wdt)|css|images|js)/
+#             security: false
+
+#             # Firewall pour les APIs (stateless)
+#         api:
+#             pattern: ^/api/
+#             stateless: true
+#         main:
+#             lazy: true
+#             provider: app_user_provider
+#             custom_authenticator: App\Security\SecurityAuthenticator
+#             logout:
+#                 path: app_logout
+#                 invalidate_session: false
+#                 # where to redirect after logout
+#                 # target: app_any_route
+#             json_login: 
+#                 check_path: api_login
+#                 username_path: email
+#                 password_path: password
+#                 #login_path: api_login
+
+#             remember_me:
+#                 secret: '%kernel.secret%'
+#                 lifetime: 604800
+#                 path: /
+#                 always_remember_me: true
+
+#             # activate different ways to authenticate
+#             # https://symfony.com/doc/current/security.html#the-firewall
+
+#             # https://symfony.com/doc/current/security/impersonating_user.html
+#             # switch_user: true
+
+#     # Easy way to control access for large sections of your site
+#     # Note: Only the *first* access control that matches will be used
+
+#     # Hirarchy of roles
+#     # role_hierarchy:
+#     #     ROLE_ADMIN: [ROLE_USER]
+#     #     ROLE_CONSERVATEUR: [ROLE_ADMIN]
+#     #     ROLE_CHEF_CADASTRE: [ROLE_ADMIN]
+#     #     ROLE_SECRETAIRE: [ROLE_USER]
+#     access_control:
+#         # - { path: ^/secretaire, roles: ROLE_SECRETAIRE }
+#         # - { path: ^/admin, roles: [ROLE_CONSERVATEUR, ROLE_CHEF_CADASTRE] }
+#         # - { path: ^/home, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#         - { path: ^/admin, roles: ROLE_ADMIN }
+#         - { path: ^/user, roles: ROLE_USER } # Temporary roles
+#         - { path: ^/profile, roles: ROLE_USER } # Temporary roles
+
+# when@test:
+#     security:
+#         password_hashers:
+#             # By default, password hashers are resource intensive and take time. This is
+#             # important to generate secure password hashes. In tests however, secure hashes
+#             # are not important, waste resources and increase test times. The following
+#             # reduces the work factor to the lowest possible values.
+#             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+#                 algorithm: auto
+#                 cost: 4 # Lowest possible value for bcrypt
+#                 time_cost: 3 # Lowest possible value for argon
+#                 memory_cost: 10 # Lowest possible value for argon
+
+
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    # Gestion des hashages des mots de passe
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+
+    # Définition des providers d'utilisateurs
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
+
     firewalls:
+        # Désactivation de la sécurité pour certaines ressources en développement
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        # Firewall pour les APIs sans état
+        api:
+            pattern: ^/api/
+            stateless: true
+
         main:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\SecurityAuthenticator
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+                invalidate_session: true
             json_login: 
                 check_path: api_login
                 username_path: email
                 password_path: password
-                #login_path: api_login
 
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800
+                lifetime: 604800 # 1 semaine
                 path: /
                 always_remember_me: true
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # Contrôles d'accès globaux
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/user, roles: ROLE_USER }
+        # - { path: ^/api/owner, roles: ROLE_USER }
         # - { path: ^/profile, roles: ROLE_USER }
+        # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
         password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4 # Valeur minimale pour bcrypt
+                time_cost: 3 # Valeur minimale pour argon
+                memory_cost: 10 # Valeur minimale pour argon

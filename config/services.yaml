@@ -12,6 +12,11 @@ services:
         public: false
 
     # Détection des contrôleurs
+    App\Serializer\OwnerDenormalizer:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['serializer.denormalizer']
+
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
