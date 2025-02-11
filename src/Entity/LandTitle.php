@@ -24,6 +24,9 @@ class LandTitle
     #[ORM\Column(length: 255)]
     private ?string $titleNumber = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $description = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $issueDate = null;
 
@@ -150,6 +153,18 @@ class LandTitle
                 $plot->setLandTitle(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

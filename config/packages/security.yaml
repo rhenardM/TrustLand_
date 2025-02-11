@@ -119,11 +119,10 @@ security:
 
     # Contrôles d'accès globaux
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/user, roles: ROLE_USER }
-        # - { path: ^/api/owner, roles: ROLE_USER }
-        # - { path: ^/profile, roles: ROLE_USER }
-        # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/admin, roles: [ROLE_CADASTRE, ROLE_CTI] }
+        - { path: ^/api/land/title, roles: [ROLE_CTI] }
+        - { path: ^/user, roles: [ROLE_OWNER, ROLE_USER, ROLE_CADASTRE, ROLE_CTI] }
+        - { path: ^/api/register, roles: [ROLE_CTI] }
 
 when@test:
     security:
