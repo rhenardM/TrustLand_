@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class LandTitleController extends AbstractController
@@ -22,6 +23,8 @@ class LandTitleController extends AbstractController
         $this->blockchainService = $blockchainService;
     }
 
+    // integrate roles CTI for create land title
+    #[IsGranted('ROLE_CTI')]    
     #[Route('/api/land/title', name: 'api_land_title', methods: ['POST'])]
     public function createLandTitle(
         Request $request,
