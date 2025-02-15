@@ -42,6 +42,12 @@ class LandTitle
     #[ORM\ManyToOne(inversedBy: 'landTitles')]
     private ?Status $Status = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]//, nullable: true( New line)
+    private ?string $previousOwner = null; // New line
+
+    #[ORM\Column(type: 'boolean')] // New line
+    private bool $isArchived = false; // New line
+
     /**
      * @var Collection<int, Plot>
      */
@@ -53,12 +59,35 @@ class LandTitle
     {
         return $this->pdfPath;
     }
-
     public function setPdfPath(string $pdfPath): self
     {
         $this->pdfPath = $pdfPath;
         return $this;
     }
+
+    // Getters et setters
+    public function getPreviousOwner(): ?string
+        {
+            return $this->previousOwner;
+        }
+    // New line(Previous line)
+    public function setPreviousOwner(?string $previousOwner): self
+        {
+            $this->previousOwner = $previousOwner;
+            return $this;
+        }
+    // New line(IsArchived)    
+    public function getIsArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setIsArchived(bool $isArchived): self
+    {
+        $this->isArchived = $isArchived;
+        return $this;
+    }
+    // End of new lines(Previous lines end Is Archived)
 
     public function __construct()
     {
