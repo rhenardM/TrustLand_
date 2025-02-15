@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\PdfGeneratorService; 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class LandTitleController extends AbstractController
@@ -24,11 +25,12 @@ class LandTitleController extends AbstractController
     }
 
     // integrate roles CTI for create land title
-    #[IsGranted('ROLE_CTI')]    
+    // #[IsGranted('ROLE_CTI')]    
     #[Route('/api/land/title', name: 'api_land_title', methods: ['POST'])]
     public function createLandTitle(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        PdfGeneratorService $pdfGeneratorService 
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -83,6 +85,10 @@ class LandTitleController extends AbstractController
         $landTitle->setOwner($owner);
         $landTitle->setStatus($status);
         $landTitle->setHash($hash);
+
+        // Générer le PDF
+        $pdfPath = $pdfGeneratorService->generateLandTitlePdf($data);
+        $landTitle->setPdfPath($pdfPath); // Enregistrer le chemin du PDF
 
         $entityManager->persist($landTitle);
         $entityManager->flush();

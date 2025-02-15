@@ -18,6 +18,9 @@ class LandTitle
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $pdfPath;
+
     #[ORM\Column(length: 255)]
     private ?string $hash = null;
 
@@ -44,6 +47,18 @@ class LandTitle
      */
     #[ORM\OneToMany(targetEntity: Plot::class, mappedBy: 'LandTitle')]
     private Collection $plots;
+
+    // Ajouter les getters et setters
+    public function getPdfPath(): ?string
+    {
+        return $this->pdfPath;
+    }
+
+    public function setPdfPath(string $pdfPath): self
+    {
+        $this->pdfPath = $pdfPath;
+        return $this;
+    }
 
     public function __construct()
     {
