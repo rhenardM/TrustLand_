@@ -59,6 +59,7 @@ class LandTitle
     {
         return $this->pdfPath;
     }
+
     public function setPdfPath(string $pdfPath): self
     {
         $this->pdfPath = $pdfPath;
@@ -87,7 +88,8 @@ class LandTitle
         $this->isArchived = $isArchived;
         return $this;
     }
-    // End of new lines(Previous lines end Is Archived)
+
+    // End of new lines previous and isArchived
 
     public function __construct()
     {
