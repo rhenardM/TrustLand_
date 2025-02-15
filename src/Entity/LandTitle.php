@@ -18,11 +18,17 @@ class LandTitle
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $pdfPath;
+
     #[ORM\Column(length: 255)]
     private ?string $hash = null;
 
     #[ORM\Column(length: 255)]
     private ?string $titleNumber = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $issueDate = null;
@@ -36,11 +42,54 @@ class LandTitle
     #[ORM\ManyToOne(inversedBy: 'landTitles')]
     private ?Status $Status = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]//, nullable: true( New line)
+    private ?string $previousOwner = null; // New line
+
+    #[ORM\Column(type: 'boolean')] // New line
+    private bool $isArchived = false; // New line
+
     /**
      * @var Collection<int, Plot>
      */
     #[ORM\OneToMany(targetEntity: Plot::class, mappedBy: 'LandTitle')]
     private Collection $plots;
+
+    // Ajouter les getters et setters
+    public function getPdfPath(): ?string
+    {
+        return $this->pdfPath;
+    }
+
+    public function setPdfPath(string $pdfPath): self
+    {
+        $this->pdfPath = $pdfPath;
+        return $this;
+    }
+
+    // Getters et setters
+    public function getPreviousOwner(): ?string
+        {
+            return $this->previousOwner;
+        }
+    // New line(Previous line)
+    public function setPreviousOwner(?string $previousOwner): self
+        {
+            $this->previousOwner = $previousOwner;
+            return $this;
+        }
+    // New line(IsArchived)    
+    public function getIsArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setIsArchived(bool $isArchived): self
+    {
+        $this->isArchived = $isArchived;
+        return $this;
+    }
+
+    // End of new lines previous and isArchived
 
     public function __construct()
     {
@@ -150,6 +199,18 @@ class LandTitle
                 $plot->setLandTitle(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
