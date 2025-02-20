@@ -33,8 +33,7 @@ class PdfGeneratorService
         if ($status) {
             $status = $this->entityManager->getRepository(Status::class)->find($status->getId());
         }
-
-
+        
         // Configurer Dompdf
         $options = new Options();
         $options->set('defaultFont', 'popins');

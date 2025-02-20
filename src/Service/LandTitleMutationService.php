@@ -47,6 +47,11 @@ class LandTitleMutationService
         $newLandTitle->setIsArchived(false);
         $newLandTitle->setPreviousOwner(null); // Réinitialiser le propriétaire précédent
 
+        // Génération  d'un nouveau PDF pour le nouveau titre
+            $newPdfPath = $this->pdfGeneratorService->generateLandTitlePdf($newLandTitle);
+            $newLandTitle->setPdfPath($newPdfPath); // Mettre à jour le chemin du PDF
+        
+
         $this->entityManager->persist($newLandTitle);
         $this->entityManager->flush();
 
