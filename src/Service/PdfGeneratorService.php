@@ -1,22 +1,47 @@
 <?php
 
-// src/Service/PdfGeneratorService.php
 namespace App\Service;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Entity\Owner;
+use App\Entity\Status;
+use App\Entity\LandTitle;
+use Doctrine\ORM\EntityManagerInterface;
 
 class PdfGeneratorService
 {
-    public function generateLandTitlePdf(array $data): string
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
+        $this->entityManager = $entityManager;
+    }
+
+    public function generateLandTitlePdf( LandTitle $landTitle): string
+    {
+        // $owner = $this->entityManager->getRepository(Owner::class)->find($landTitle->getOwnerId());
+        // $status = $this->entityManager->getRepository(Status::class)->find($landTitle->getStatusId());
+        
+        // Récupération du propriétaire et du statut actuel
+        $owner = $landTitle->getOwner();
+        if ($owner) {
+            $owner = $this->entityManager->getRepository(Owner::class)->find($owner->getId());
+        }
+        $status = $landTitle->getStatus();
+
+        if ($status) {
+            $status = $this->entityManager->getRepository(Status::class)->find($status->getId());
+        }
+
+
         // Configurer Dompdf
         $options = new Options();
-        $options->set('defaultFont', 'Helvetica');
+        $options->set('defaultFont', 'popins');
         $dompdf = new Dompdf($options);
 
         // Générer le contenu HTML du PDF
-        $html = $this->renderPdfHtml($data);
+        $html = $this->renderPdfHtml($landTitle, $owner, $status);
 
         // Charger le HTML dans Dompdf
         $dompdf->loadHtml($html);
@@ -30,7 +55,7 @@ class PdfGeneratorService
         return $pdfPath;
     }
 
-    private function renderPdfHtml(array $data): string
+    private function renderPdfHtml(LandTitle $landTitle, Owner $owner, Status $status): string
     {
         // Styles CSS
         $styles = "
@@ -44,7 +69,7 @@ class PdfGeneratorService
                 .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #7f8c8d; }
             </style>
         ";
-    
+
         // Contenu HTML
         $html = "
             <html>
@@ -61,23 +86,27 @@ class PdfGeneratorService
                         </tr>
                         <tr>
                             <td><strong>Title Number</strong></td>
-                            <td>{$data['titleNumber']}</td>
+                            <td>{$landTitle->getTitleNumber()}</td>
                         </tr>
                         <tr>
                             <td><strong>Owner</strong></td>
-                            <td>{$data['owner_id']}</td>
+                            <td>{$owner->getFirstName()} {$owner->getName()}</td>
                         </tr>
                         <tr>
                             <td><strong>Issue Date</strong></td>
-                            <td>{$data['issueDate']}</td>
+                            <td>{$landTitle->getIssueDate()->format('Y-m-d')}</td>
                         </tr>
                         <tr>
                             <td><strong>Expiration Date</strong></td>
-                            <td>{$data['expirationDate']}</td>
+                            <td>{$landTitle->getExpirationDate()->format('Y-m-d')}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Description</strong></td>
+                            <td>{$landTitle->getDescription()}</td>
                         </tr>
                         <tr>
                             <td><strong>Status</strong></td>
-                            <td>{$data['status_id']}</td>
+                            <td>{$status->getDescription()}</td>
                         </tr>
                     </table>
                     <div class='footer'>
@@ -86,7 +115,7 @@ class PdfGeneratorService
                 </body>
             </html>
         ";
-    
+
         return $html;
     }
 }

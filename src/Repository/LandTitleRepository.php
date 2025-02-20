@@ -16,6 +16,15 @@ class LandTitleRepository extends ServiceEntityRepository
         parent::__construct($registry, LandTitle::class);
     }
 
+    public function findArchivedTitles(): array
+    {
+        return $this->createQueryBuilder('lt')
+            ->andWhere('lt.isArchived = :isArchived')
+            ->setParameter('isArchived', true)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return LandTitle[] Returns an array of LandTitle objects
     //     */

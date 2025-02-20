@@ -87,7 +87,7 @@ class LandTitleController extends AbstractController
         $landTitle->setHash($hash);
 
         // Générer le PDF
-        $pdfPath = $pdfGeneratorService->generateLandTitlePdf($data);
+        $pdfPath = $pdfGeneratorService->generateLandTitlePdf($landTitle);
         $landTitle->setPdfPath($pdfPath); // Enregistrer le chemin du PDF
 
         $entityManager->persist($landTitle);
@@ -102,6 +102,7 @@ class LandTitleController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Land Title created successfully.',
+            'landTitleId' => $landTitle->getId(), // Ajoute l'ID du titre créé
             'transaction' => $txHash
         ], Response::HTTP_CREATED);
     }
