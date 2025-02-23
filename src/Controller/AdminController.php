@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/api/admin', name: 'admin_')]
 class AdminController extends AbstractController
 {
     public function __construct
@@ -17,7 +18,7 @@ class AdminController extends AbstractController
     ){}
 
     //Récupérer tous les documents archivés.
-    #[Route('/admin/archived-land-titles', name: 'admin_archived_land_titles', methods: ['GET'])]
+    #[Route('/archived-land-titles', name: 'admin_archived_land_titles', methods: ['GET'])]
     public function getArchivedLandTitles(): JsonResponse
     {
         $archivedTitles = $this->landTitleRepository->findBy(['isArchived' => true]);
@@ -31,7 +32,7 @@ class AdminController extends AbstractController
     }
 
     //Récupérer tous les documents non archivés (actifs).
-    #[Route('/admin/active-land-titles', name: 'admin_active_land_titles', methods: ['GET'])]
+    #[Route('/active-land-titles', name: 'admin_active_land_titles', methods: ['GET'])]
     public function getActiveLandTitles(): JsonResponse
     {
         $activeTitles = $this->landTitleRepository->findBy(['isArchived' => false]);
@@ -45,7 +46,7 @@ class AdminController extends AbstractController
     }
 
     //Récupérer le compte des documents archivés et non archivés.
-    #[Route('/admin/land-titles-count', name: 'admin_land_titles_count', methods: ['GET'])]
+    #[Route('/land-titles-count', name: 'admin_land_titles_count', methods: ['GET'])]
     public function getLandTitlesCount(): JsonResponse
     {
         $archivedCount = $this->landTitleRepository->count(['isArchived' => true]);
