@@ -119,10 +119,17 @@ security:
 
     # Contrôles d'accès globaux
     access_control:
-        # - { path: ^/admin, roles: [ROLE_CADASTRE, ROLE_CTI] }
-        # # - { path: ^/api/land/title, roles: [ROLE_CTI] }
-        # - { path: ^/user, roles: [ROLE_OWNER, ROLE_USER, ROLE_CADASTRE, ROLE_CTI] }
-        # - { path: ^/api/register, roles: [ROLE_CTI] }
+        # Accès à l'administration
+        - { path: ^/api/admin, roles: [ROLE_CADASTRE, ROLE_CTI] }
+
+        # Accès à l'API pour la gestion des titres fonciers (Land Titles)
+        - { path: ^/api/land/title, roles: [ROLE_CTI] }
+
+        # Accès aux utilisateurs (profils, gestion, etc.)
+        - { path: ^/user, roles: [ROLE_OWNER, ROLE_USER, ROLE_CADASTRE, ROLE_CTI] }
+
+        # Inscription de nouveaux utilisateurs
+        - { path: ^/api/register, roles: [ROLE_CTI] }
 
 when@test:
     security:

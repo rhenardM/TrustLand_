@@ -55,7 +55,28 @@ class LoginController extends AbstractController
         $roles = $user->getRoles();
 
         // Déterminer la route de redirection en fonction du rôle
-        $redirect = in_array('ROLE_ADMIN', $roles) ? '/admin' : '/dashboard';
+        
+        // $redirect = in_array('ROLE_ADMIN', $roles) ? '/admin' : '/dashboard';
+            // Déterminer la route de redirection en fonction du rôle
+            // if (in_array('ROLE_SUPER_ADMIN', $roles)) {
+            //     $redirect = '/api/admin';
+            // } elseif (in_array('ROLE_ADMIN', $roles)) {
+            //     $redirect = '/admin';
+            // } else {
+            //     $redirect = '/dashboard';
+            // }
+
+            // Ajout de la condition pour le rôle ROLE_CADASTRE, une approche plus lisible et efficace que les if successifs.
+            // Elle évite l'imbrication de if/else et facilite la maintenance.
+            $redirect = match (true) {
+                in_array('ROLE_SUPER_ADMIN', $roles) => '/api/admin',
+                in_array('ROLE_ADMIN', $roles) => '/admin',
+                in_array('ROLE_CTI', $roles) => '/api/admin',
+                in_array('ROLE_CADASTRE', $roles) => '/admin', 
+                in_array('ROLE_OWNER', $roles) => '/user',     
+                in_array('ROLE_USER', $roles) => '/user',
+                default => '/dashboard',
+            };
 
         // Réponse JSON avec le token et les informations de l'utilisateur
         return new JsonResponse([
